@@ -1,5 +1,8 @@
+from aifc import Error
+
 import cv2
 import numpy as np
+import pyautogui
 from pyautogui import RIGHT
 
 import HandTrackingModule as htm
@@ -37,9 +40,26 @@ while True:
     # 3. Check which fingers are up
     fingers = detector.fingersUp()
     # print(fingers)
-    cv2.rectangle(img, (frameR, frameR), (wCam - frameR, hCam - frameR),
-                  (255, 0, 255), 2)
+    # cv2.rectangle(img, (frameR, frameR), (wCam - frameR, hCam - frameR),
+    #               (255, 0, 255), 2)
+
+    if fingers[0] == 1 and fingers[1] == 1 and fingers[4] == 1:  # and fingers[2] == 1:
+        length, img, lineInfo = detector.findDistance(4, 8, img)
+
+        print(length)
+        # 10. Click mouse if distance short
+        if length > 20:  # and length1 < 10:
+            # cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
+            # autopy.mouse.click()
+            pyautogui.scroll(200)
+            # 11. Frame Rate
+            cTime = time.time()
+            fps = 1 / (cTime - pTime)
+            pTime = cTime
+            cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
+                        (255, 0, 0), 3)
     # 4. Only Index Finger : Moving Mode
+
     if fingers [1] == 1 and fingers[2] == 0:
         # 5. Convert Coordinates
         x3 = np.interp(x1, (frameR, wCam - frameR), (0, wScr))
@@ -53,24 +73,8 @@ while True:
             autopy.mouse.move(wScr - clocX, clocY)
             cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
             plocX, plocY = clocX, clocY
-        except IndexError:
+        except Error:
             cv2.putText(img, "Out of Bounds", (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
-                        (255, 0, 0), 3)
-    if fingers[1] == 1 and fingers[2] == 1 and fingers[3] == 1:
-        length, img, lineInfo = detector.findDistance(8, 12, img)
-        length1, img, lineInfo1 = detector.findDistance(12, 16, img)
-
-        print(length)
-        # 10. Click mouse if distance short
-        if length < 30 and length < 30:
-            cv2.circle(img, (lineInfo[4], lineInfo[5]),15, (0, 255, 0), cv2.FILLED)
-            autopy.mouse.click(1)
-
-            # 11. Frame Rate
-            cTime = time.time()
-            fps = 1 / (cTime - pTime)
-            pTime = cTime
-            cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
                         (255, 0, 0), 3)
 
     # 8. Both Index and middle fingers are up : Clicking Mode
@@ -90,7 +94,56 @@ while True:
             pTime = cTime
             cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
                         (255, 0, 0), 3)
-            # 12. Display
+
+
+        if fingers[2] == 1 and fingers[1] == 1 and fingers[0] == 1:# and fingers[2] == 1:
+            length, img, lineInfo = detector.findDistance(4, 12, img)
+
+            print(length)
+            # 10. Click mouse if distance short
+            if length < 1000:  # and length1 < 10:
+                #cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
+                # autopy.mouse.click()
+                pyautogui.scroll(-200)
+                # 11. Frame Rate
+                cTime = time.time()
+                fps = 1 / (cTime - pTime)
+                pTime = cTime
+                cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
+                        (255, 0, 0), 3)
+
+
+        if fingers[1] == 1 and fingers[2] == 1 and fingers[3] == 1 :
+            length, img, lineInfo = detector.findDistance(8, 12, img)
+            length1, img, lineInfo2 = detector.findDistance(12, 16, img)
+            #length2, img, lineInfo3 = detector.findDistance(16, 20, img)
+
+            print(length)
+            # 10. Click mouse if distance short
+            if length < 40 and length1 < 40:
+                cv2.circle(img, (lineInfo[4], lineInfo[5]), 15, (0, 255, 0), cv2.FILLED)
+                #autopy.mouse.click()
+                pyautogui.click(button='right')
+                # 11. Frame Rate
+                cTime = time.time()
+                fps = 1 / (cTime - pTime)
+                pTime = cTime
+                cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
+                            (255, 0, 0), 3)
+
+        '''if fingers[1] == 1 and fingers[2] == 1 and fingers[3] == 1 and fingers[4] == 1 and fingers[0]==1:
+            length0, img, lineInfo = detector.findDistance(4, 12, img)
+            length, img, lineInfo = detector.findDistance(4, 20, img)
+            length1, img, lineInfo2 = detector.findDistance(12, 20, img)
+            if length < 40 and length1 < 40 and length0 < 40:
+                x, y = pyautogui.position()
+                pyautogui.dragTo(x, y, button='left')
+
+                cTime = time.time()
+                fps = 1 / (cTime - pTime)
+                pTime = cTime
+                cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
+                            (255, 0, 0), 3)'''
 
     #cv2.waitKey(1)
     key = cv2.waitKey(1) & 0xFF
